@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 export default function Home() {
   return (
-    <div className="max-w-6xl mx-auto p-6 pb-28">
+    <div className="max-w-6xl mx-auto p-6 pb-36">
       <div className="mb-10">
   <h1 className="text-3xl md:text-5xl font-bold leading-tight">
   SAP ABAP Troubleshooting Specialist
@@ -23,7 +23,7 @@ export default function Home() {
   onClick={() => {
     document.getElementById("contact").scrollIntoView({ behavior: "smooth" });
   }}
-  className="bg-blue-600 px-5 py-3 text-base md:text-lg rounded-lg hover:bg-blue-500 transition"
+  className="bg-blue-600 px-6 py-3 text-base md:text-lg rounded-lg shadow-lg shadow-blue-500/20 hover:scale-105 transition"
 >
   Contact Me
 </button>
@@ -40,40 +40,24 @@ export default function Home() {
 
 {/* IMPACT SUMMARY */}
 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-  <div className="bg-gray-800 p-4 rounded-xl border border-gray-700">
+  <div className="bg-gray-800 p-3 rounded-xl border border-gray-700">
     <p className="text-gray-400 text-sm">Total Cases</p>
-    <p className="text-3xl font-bold">5</p>
+    <p className="text-2xl md:text-3xl font-bold">5</p>
   </div>
 
-  <div className="bg-gray-800 p-4 rounded-xl border border-gray-700">
+  <div className="bg-gray-800 p-3 rounded-xl border border-gray-700">
     <p className="text-yellow-400">Advanced Cases</p>
     <p className="text-2xl font-bold text-yellow-400">3</p>
   </div>
 
-  <div className="bg-gray-800 p-4 rounded-xl border border-gray-700">
+  <div className="bg-gray-800 p-3 rounded-xl border border-gray-700">
     <p className="text-green-400">Performance Improved</p>
     <p className="text-2xl font-bold text-green-400">~90%</p>
   </div>
 
-  <div className="bg-gray-800 p-4 rounded-xl border border-gray-700">
+  <div className="bg-gray-800 p-3 rounded-xl border border-gray-700">
     <p className="text-red-400">Issues Fixed</p>
     <p className="text-2xl font-bold text-red-400">3+</p>
-  </div>
-</div>
-
-{/* EXPERTISE */}
-<div className="mb-10">
-  <h2 className="text-xl font-bold mb-4">Core Expertise</h2>
-
-  <div className="flex flex-wrap gap-3">
-    {["SAP WM", "ALV", "BAPI", "IDoc", "Performance Tuning"].map((skill) => (
-      <span
-        key={skill}
-        className="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full text-sm"
-      >
-        {skill}
-      </span>
-    ))}
   </div>
 </div>
 

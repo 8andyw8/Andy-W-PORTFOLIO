@@ -2,8 +2,13 @@
 @import "tw-animate-css";
 @media print {
   body {
-    background: white !important;
+    background: linear-gradient(180deg, #0f172a 0%, #020617 100%);
+  color: white;
   }
+
+  html {
+  scroll-behavior: smooth;
+}
 
   .no-print {
     display: none;

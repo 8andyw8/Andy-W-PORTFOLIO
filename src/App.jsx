@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Home from "./pages/Home";
-import CaseDetail from "./pages/CaseDetail";
+import Home from "./Pages/Home";
+import CaseDetail from "./Pages/CaseDetail";
 
 export default function App() {
   return (

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 export default function Home() {
   return (
-    <div className="max-w-6xl mx-auto p-6 pb-44">
+    <div className="max-w-6xl mx-auto p-6 pb-52">
       <div className="mb-10">
   <h1 className="text-3xl md:text-5xl font-bold leading-tight">
   SAP ABAP Troubleshooting Specialist
@@ -39,7 +39,7 @@ export default function Home() {
 </div>
 
 {/* IMPACT SUMMARY */}
-<div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
+<div className="grid grid-cols-2 gap-3 mb-10">
   <div className="bg-gray-800 p-3 rounded-xl border border-gray-700">
     <p className="text-gray-400 text-sm">Total Cases</p>
     <p className="text-2xl md:text-3xl font-bold">5</p>

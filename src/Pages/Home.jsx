@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 export default function Home() {
   return (
-    <div className="max-w-6xl mx-auto p-6 pb-36">
+    <div className="max-w-6xl mx-auto p-6 pb-44">
       <div className="mb-10">
   <h1 className="text-3xl md:text-5xl font-bold leading-tight">
   SAP ABAP Troubleshooting Specialist
@@ -39,7 +39,7 @@ export default function Home() {
 </div>
 
 {/* IMPACT SUMMARY */}
-<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+<div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
   <div className="bg-gray-800 p-3 rounded-xl border border-gray-700">
     <p className="text-gray-400 text-sm">Total Cases</p>
     <p className="text-2xl md:text-3xl font-bold">5</p>
@@ -66,7 +66,7 @@ export default function Home() {
         {data.map((item) => (
           <div
             key={item.slug}
-            className={`bg-gray-800 border rounded-2xl p-5
+            className={`bg-gray-800 border rounded-2xl p-5 shadow-md hover:shadow-xl
   ${item.slug === "lt06-lt04-issue"
     ? "border-blue-500 ring-2 ring-blue-500/20"
     : "border-gray-700"}
@@ -76,7 +76,7 @@ export default function Home() {
             <p className="text-xs px-2 py-1 bg-blue-500/20 text-blue-400 rounded-md">{item.category}</p>
 
             <div className="mt-2">
-  <h2 className="font-semibold text-lg">
+  <h2 className="font-semibold text-base md:text-lg leading-snug">
     {item.title}
   </h2>
 

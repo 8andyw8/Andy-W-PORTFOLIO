@@ -18,7 +18,7 @@ export default function Home() {
 </p>
 
 {/* ✅ TAMBAHAN BARU (CTA BUTTON) */}
-<div className="mt-4 flex gap-3">
+<div className="mt-5 flex gap-3">
   <button
   onClick={() => {
     document.getElementById("contact").scrollIntoView({ behavior: "smooth" });
@@ -70,7 +70,7 @@ export default function Home() {
   ${item.slug === "lt06-lt04-issue"
     ? "border-blue-500"
     : "border-gray-700"}
-  hover:scale-[1.02] hover:shadow-xl hover:shadow-blue-500/10
+  hover:scale-[1.02] hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-500/10
   transition duration-300`}
           >
             <p className="text-xs px-2 py-1 bg-blue-500/20 text-blue-400 rounded-md">{item.category}</p>

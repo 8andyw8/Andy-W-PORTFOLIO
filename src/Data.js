@@ -65,30 +65,30 @@ ENDIF.`,
 
 {
   slug: "bapi-commit2",
-  title: "BAPI Not Commit Data",
+  title: "BAPI Not Commit Data 2",
   category: "BAPI",
 },
 {
   slug: "bapi-commit3",
-  title: "BAPI Not Commit Data",
+  title: "BAPI Not Commit Data 3",
   category: "BAPI",
 },
 
 {
   slug: "bapi-commit4",
-  title: "BAPI Not Commit Data",
+  title: "BAPI Not Commit Data 4",
   category: "BAPI",
 },
 
 {
   slug: "bapi-commit5",
-  title: "BAPI Not Commit Data",
+  title: "BAPI Not Commit Data 5",
   category: "BAPI",
 },
 
 {
   slug: "bapi-commit6",
-  title: "BAPI Not Commit Data",
+  title: "BAPI Not Commit Data 6",
   category: "BAPI",
 }
 

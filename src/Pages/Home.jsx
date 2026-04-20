@@ -117,9 +117,9 @@ export default function Home() {
     Need SAP Troubleshooting Support?
   </h2>
 
-  {/* <p className="text-gray-400 mb-4">
+  <p className="text-gray-400 mb-4">
     Open for freelance / consulting opportunities
-  </p> */}
+  </p>
 
   <div className="flex flex-col sm:flex-row justify-center gap-3">
     <a

@@ -15,13 +15,9 @@ export default function CaseDetail() {
 
   const [selectedImage, setSelectedImage] = useState(null);
 
-  const [editingId, setEditingId] = useState(null);
-  const [editingNote, setEditingNote] = useState("");
   const [saving, setSaving] = useState(false);
-
   const [isEditingCase, setIsEditingCase] = useState(false);
   const [form, setForm] = useState({});
-
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -36,11 +32,13 @@ export default function CaseDetail() {
     setLoading(false);
   };
 
+  // 🔐 AUTH CHECK
   const checkAuth = async () => {
     const { data } = await supabase.auth.getUser();
-    if (!data.user) window.location.href = "/login";
+    if (!data.user) window.location.href = "/";
   };
 
+  // 👤 ROLE
   const fetchRole = async () => {
     const { data: userData } = await supabase.auth.getUser();
     if (!userData.user) return;
@@ -54,6 +52,7 @@ export default function CaseDetail() {
     setRole(data?.role || "viewer");
   };
 
+  // 📦 FETCH CASE + IMAGES
   const fetchCase = async () => {
     const { data, error } = await supabase
       .from("cases")
@@ -78,6 +77,7 @@ export default function CaseDetail() {
     setImages(imgData || []);
   };
 
+  // 💾 SAVE EDIT
   const handleSaveCase = async () => {
     setSaving(true);
 
@@ -96,23 +96,17 @@ export default function CaseDetail() {
     setSaving(false);
   };
 
+  // ❌ DELETE IMAGE
   const handleDelete = async (id) => {
     if (!confirm("Delete image?")) return;
+
     await supabase.from("case_images").delete().eq("id", id);
-    await fetchCase();
+
+    // 🔥 langsung update UI tanpa refetch full
+    setImages((prev) => prev.filter((img) => img.id !== id));
   };
 
-  const saveNote = async (id) => {
-    await supabase
-      .from("case_images")
-      .update({ note: editingNote })
-      .eq("id", id);
-
-    await fetchCase();
-    setEditingId(null);
-    setEditingNote("");
-  };
-
+  // 📋 COPY CODE
   const handleCopy = () => {
     navigator.clipboard.writeText(caseData.codeSnippet || "");
     setCopied(true);
@@ -126,7 +120,7 @@ export default function CaseDetail() {
     <div className="min-h-screen bg-gray-100 text-gray-800">
       <div className="max-w-6xl mx-auto p-6 pb-20">
 
-        {/* 🔙 BACK BUTTON */}
+        {/* BACK */}
         <button
           onClick={() => navigate("/")}
           className="mb-4 text-sm text-blue-600 hover:underline"
@@ -196,7 +190,6 @@ export default function CaseDetail() {
 
         {/* CONTENT */}
         <div className="mt-8 space-y-5">
-
           {[
             { key: "impact", label: "Impact" },
             { key: "problem", label: "Problem" },
@@ -238,14 +231,14 @@ export default function CaseDetail() {
             );
           })}
 
-          {/* CODE SNIPPET */}
+          {/* CODE */}
           {caseData.codeSnippet && (
             <div className="bg-white border rounded-xl p-4">
               <div className="flex justify-between items-center mb-2">
                 <h3 className="font-semibold">Code Snippet</h3>
                 <button
                   onClick={handleCopy}
-                  className="text-xs bg-gray-200 px-2 py-1 rounded hover:bg-gray-300"
+                  className="text-xs bg-gray-200 px-2 py-1 rounded"
                 >
                   {copied ? "Copied!" : "Copy"}
                 </button>
@@ -256,7 +249,6 @@ export default function CaseDetail() {
               </pre>
             </div>
           )}
-
         </div>
 
         {/* UPLOADER */}
@@ -274,7 +266,6 @@ export default function CaseDetail() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {images.map((img) => (
                 <div key={img.id} className="bg-white border p-3 rounded-xl">
-
                   <img
                     src={img.image_url}
                     onClick={() => setSelectedImage(img.image_url)}

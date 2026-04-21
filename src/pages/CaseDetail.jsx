@@ -20,6 +20,9 @@ export default function CaseDetail() {
   const [form, setForm] = useState({});
   const [copied, setCopied] = useState(false);
 
+  // ✅ FIX: state untuk note (biar bisa save)
+  const [notes, setNotes] = useState({});
+
   useEffect(() => {
     init();
   }, [slug]);
@@ -50,7 +53,6 @@ export default function CaseDetail() {
     setRole(data?.role || "viewer");
   };
 
-  // ✅ FIX: handle RLS empty array
   const fetchCase = async () => {
     const { data, error } = await supabase
       .from("cases")
@@ -73,11 +75,16 @@ export default function CaseDetail() {
       .eq("case_id", data.id)
       .order("created_at", { ascending: true });
 
-    if (imgError) {
-      console.error("IMG ERROR:", imgError.message);
-    }
+    if (imgError) console.error(imgError);
 
     setImages(imgData || []);
+
+    // ✅ init notes state
+    const noteMap = {};
+    (imgData || []).forEach((img) => {
+      noteMap[img.id] = img.note || "";
+    });
+    setNotes(noteMap);
   };
 
   const handleSaveCase = async () => {
@@ -105,12 +112,29 @@ export default function CaseDetail() {
     setImages((prev) => prev.filter((img) => img.id !== id));
   };
 
-  // ✅ NEW: update note
-  const handleUpdateNote = async (id, note) => {
+  // ✅ DELETE ALL
+  const handleDeleteAll = async () => {
+    if (!confirm("Delete ALL images?")) return;
+
+    await supabase
+      .from("case_images")
+      .delete()
+      .eq("case_id", caseData.id);
+
+    setImages([]);
+  };
+
+  // ✅ UPDATE NOTE (pakai button save)
+  const handleUpdateNote = async (id) => {
+    const note = notes[id] || "";
+
     await supabase
       .from("case_images")
       .update({ note })
       .eq("id", id);
+
+    // refresh biar persist
+    await fetchCase();
   };
 
   const handleCopy = () => {
@@ -126,7 +150,6 @@ export default function CaseDetail() {
     <div className="min-h-screen bg-gray-100 text-gray-800">
       <div className="max-w-6xl mx-auto p-6 pb-20">
 
-        {/* BACK */}
         <button
           onClick={() => navigate("/")}
           className="mb-4 text-sm text-blue-600 hover:underline"
@@ -134,7 +157,6 @@ export default function CaseDetail() {
           ← Back to Home
         </button>
 
-        {/* HEADER */}
         <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
           <div className="w-full">
             <h1 className="text-3xl font-bold">{caseData.title}</h1>
@@ -231,19 +253,9 @@ export default function CaseDetail() {
               )}
             </div>
 
-            {isEditingCase ? (
-              <textarea
-                value={form.codeSnippet || ""}
-                onChange={(e) =>
-                  setForm({ ...form, codeSnippet: e.target.value })
-                }
-                className="w-full border p-3 rounded font-mono text-sm h-40"
-              />
-            ) : (
-              <pre className="bg-gray-100 p-3 rounded overflow-x-auto text-sm">
-                <code>{caseData.codeSnippet}</code>
-              </pre>
-            )}
+            <pre className="bg-gray-100 p-3 rounded overflow-x-auto text-sm">
+              <code>{caseData.codeSnippet}</code>
+            </pre>
           </div>
         </div>
 
@@ -262,7 +274,18 @@ export default function CaseDetail() {
         {/* IMAGES */}
         {images.length > 0 && (
           <div className="mt-10">
-            <h2 className="font-semibold text-lg mb-4">Debug / Flow</h2>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="font-semibold text-lg">Debug / Flow</h2>
+
+              {role === "admin" && (
+                <button
+                  onClick={handleDeleteAll}
+                  className="text-xs text-red-600"
+                >
+                  Delete All
+                </button>
+              )}
+            </div>
 
             <div className="grid md:grid-cols-2 gap-5">
               {images.map((img) => (
@@ -274,16 +297,23 @@ export default function CaseDetail() {
                     className="rounded cursor-pointer"
                   />
 
-                  {/* ✅ NOTE EDIT FIX */}
                   {role === "admin" ? (
-                    <textarea
-                      defaultValue={img.note || ""}
-                      placeholder="Add note..."
-                      onBlur={(e) =>
-                        handleUpdateNote(img.id, e.target.value)
-                      }
-                      className="w-full mt-2 border p-2 rounded text-sm"
-                    />
+                    <>
+                      <textarea
+                        value={notes[img.id] || ""}
+                        onChange={(e) =>
+                          setNotes({ ...notes, [img.id]: e.target.value })
+                        }
+                        className="w-full mt-2 border p-2 rounded text-sm"
+                      />
+
+                      <button
+                        onClick={() => handleUpdateNote(img.id)}
+                        className="text-xs bg-blue-500 text-white px-2 py-1 mt-1 rounded"
+                      >
+                        Save Note
+                      </button>
+                    </>
                   ) : (
                     <p className="text-sm text-gray-500 mt-2">
                       {img.note || "-"}

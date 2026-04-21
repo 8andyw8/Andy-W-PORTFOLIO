@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../supabase";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import LiveChat from "../components/LiveChat";
 
 export default function Home() {
+  const navigate = useNavigate();
+
   const [cases, setCases] = useState([]);
   const [role, setRole] = useState("viewer");
   const [loading, setLoading] = useState(true);
@@ -102,9 +104,7 @@ export default function Home() {
         return;
       }
 
-      // langsung update UI tanpa fetch ulang
       setCases((prev) => [...data, ...prev]);
-
       handleCancel();
     } finally {
       setSaving(false);
@@ -117,10 +117,10 @@ export default function Home() {
     setNewCase({ title: "", category: "", impact: "" });
   };
 
-  // 🚪 LOGOUT
+  // 🚪 LOGOUT (FIXED)
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    window.location.href = "/login";
+    navigate("/"); // ✅ FIX: bukan /login
   };
 
   if (loading) return <div className="p-6">Loading...</div>;
@@ -129,7 +129,6 @@ export default function Home() {
     <div className="max-w-6xl mx-auto p-6 pb-40">
 
       {/* ================= HEADER ================= */}
-      {/* ❗ SEKARANG HEADER HANYA UNTUK INFO + LOGOUT */}
       <div className="mb-10 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
         <div>
           <h1 className="text-3xl md:text-5xl font-bold">
@@ -167,7 +166,6 @@ export default function Home() {
       </div>
 
       {/* ================= LIST HEADER ================= */}
-      {/* ✅ INI TEMPAT YANG BENAR UNTUK ADD CASE */}
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold">Cases</h2>
 
@@ -182,7 +180,6 @@ export default function Home() {
       </div>
 
       {/* ================= FORM ================= */}
-      {/* muncul tepat di bawah tombol add case */}
       {showForm && (
         <div className="bg-white border p-5 rounded-xl mb-8 shadow-sm space-y-3">
 
@@ -213,7 +210,6 @@ export default function Home() {
             className="w-full p-2 border rounded"
           />
 
-          {/* ACTION BUTTON */}
           <div className="flex gap-2 pt-2">
             <button
               onClick={handleCreate}
@@ -260,22 +256,32 @@ export default function Home() {
         </div>
       )}
 
-{/* ================= CTA / FOOTER ================= */}
-{/* CTA */} 
-<div id="contact" className="mt-16 text-center"> 
-  <h2 className="text-xl font-bold mb-2"> Need SAP Troubleshooting Support? </h2> 
-  <p className="text-gray-400 mb-4"> Open for freelance / consulting opportunities </p> 
-  <div className="flex flex-col sm:flex-row justify-center gap-3"> 
-    <a href="https://wa.me/6287781507123" target="_blank" className="px-4 py-2 bg-green-600 hover:bg-green-500 rounded-md" > 
-    💬 WhatsApp Me </a> 
-    
-    <a href="https://www.linkedin.com/in/andy-w-a33233a0/" className="px-4 py-2 border border-gray-600 rounded-md hover:bg-gray-800" >
-     🔗 LinkedIn </a> 
-     
-     <a href="mailto:8andyw8@gmail.com" className="px-4 py-2 border border-gray-600 rounded-md hover:bg-gray-800" > 
-      💼 Hire Me </a> 
-      </div> 
-    </div>
+      {/* ================= CTA ================= */}
+      <div id="contact" className="mt-16 text-center"> 
+        <h2 className="text-xl font-bold mb-2">
+          Need SAP Troubleshooting Support?
+        </h2> 
+        <p className="text-gray-400 mb-4">
+          Open for freelance / consulting opportunities
+        </p> 
+
+        <div className="flex flex-col sm:flex-row justify-center gap-3"> 
+          <a href="https://wa.me/6287781507123" target="_blank"
+            className="px-4 py-2 bg-green-600 hover:bg-green-500 rounded-md">
+            💬 WhatsApp Me
+          </a> 
+          
+          <a href="https://www.linkedin.com/in/andy-w-a33233a0/"
+            className="px-4 py-2 border border-gray-600 rounded-md hover:bg-gray-800">
+            🔗 LinkedIn
+          </a> 
+          
+          <a href="mailto:8andyw8@gmail.com"
+            className="px-4 py-2 border border-gray-600 rounded-md hover:bg-gray-800">
+            💼 Hire Me
+          </a> 
+        </div> 
+      </div>
 
     </div>
   );

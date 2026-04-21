@@ -32,7 +32,7 @@ export default function CaseDetail() {
     setLoading(false);
   };
 
-  // 🔐 AUTH CHECK
+  // 🔐 AUTH
   const checkAuth = async () => {
     const { data } = await supabase.auth.getUser();
     if (!data.user) window.location.href = "/";
@@ -52,7 +52,7 @@ export default function CaseDetail() {
     setRole(data?.role || "viewer");
   };
 
-  // 📦 FETCH CASE + IMAGES
+  // 📦 FETCH
   const fetchCase = async () => {
     const { data, error } = await supabase
       .from("cases")
@@ -77,7 +77,7 @@ export default function CaseDetail() {
     setImages(imgData || []);
   };
 
-  // 💾 SAVE EDIT
+  // 💾 SAVE
   const handleSaveCase = async () => {
     setSaving(true);
 
@@ -102,11 +102,10 @@ export default function CaseDetail() {
 
     await supabase.from("case_images").delete().eq("id", id);
 
-    // 🔥 langsung update UI tanpa refetch full
     setImages((prev) => prev.filter((img) => img.id !== id));
   };
 
-  // 📋 COPY CODE
+  // 📋 COPY
   const handleCopy = () => {
     navigator.clipboard.writeText(caseData.codeSnippet || "");
     setCopied(true);
@@ -132,31 +131,21 @@ export default function CaseDetail() {
         <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
 
           <div className="w-full">
+            <h1 className="text-3xl font-bold">{caseData.title}</h1>
+
             {isEditingCase ? (
               <input
-                value={form.title || ""}
-                disabled
-                className="text-3xl font-bold bg-white border p-2 rounded w-full"
+                value={form.category || ""}
+                onChange={(e) =>
+                  setForm({ ...form, category: e.target.value })
+                }
+                className="mt-2 bg-white border p-2 rounded"
               />
             ) : (
-              <h1 className="text-3xl font-bold">{caseData.title}</h1>
+              <span className="mt-2 inline-block text-xs px-3 py-1 bg-blue-100 text-blue-600 rounded">
+                {caseData.category}
+              </span>
             )}
-
-            <div className="mt-2">
-              {isEditingCase ? (
-                <input
-                  value={form.category || ""}
-                  onChange={(e) =>
-                    setForm({ ...form, category: e.target.value })
-                  }
-                  className="bg-white border p-2 rounded"
-                />
-              ) : (
-                <span className="text-xs px-3 py-1 bg-blue-100 text-blue-600 rounded">
-                  {caseData.category}
-                </span>
-              )}
-            </div>
           </div>
 
           {role === "admin" && (
@@ -195,23 +184,14 @@ export default function CaseDetail() {
             { key: "problem", label: "Problem" },
             { key: "rootCause", label: "Root Cause" },
             { key: "solution", label: "Solution" },
-            { key: "before", label: "Before", color: "red" },
-            { key: "after", label: "After", color: "green" }
+            { key: "before", label: "Before" },
+            { key: "after", label: "After" }
           ].map((f) => {
             const value = caseData[f.key];
             if (!value && !isEditingCase) return null;
 
             return (
-              <div
-                key={f.key}
-                className={`p-4 rounded-xl border bg-white ${
-                  f.color === "red"
-                    ? "border-red-300"
-                    : f.color === "green"
-                    ? "border-green-300"
-                    : "border-gray-200"
-                }`}
-              >
+              <div key={f.key} className="p-4 rounded-xl border bg-white">
                 <h3 className="font-semibold mb-1">{f.label}</h3>
 
                 {isEditingCase ? (
@@ -223,35 +203,45 @@ export default function CaseDetail() {
                     className="w-full border p-2 rounded"
                   />
                 ) : (
-                  <p className="text-gray-700 whitespace-pre-line">
-                    {value}
-                  </p>
+                  <p className="whitespace-pre-line">{value}</p>
                 )}
               </div>
             );
           })}
 
-          {/* CODE */}
-          {caseData.codeSnippet && (
-            <div className="bg-white border rounded-xl p-4">
-              <div className="flex justify-between items-center mb-2">
-                <h3 className="font-semibold">Code Snippet</h3>
+          {/* ✅ CODE SNIPPET (FIXED) */}
+          <div className="bg-white border rounded-xl p-4">
+            <div className="flex justify-between items-center mb-2">
+              <h3 className="font-semibold">Code Snippet</h3>
+
+              {!isEditingCase && (
                 <button
                   onClick={handleCopy}
                   className="text-xs bg-gray-200 px-2 py-1 rounded"
                 >
                   {copied ? "Copied!" : "Copy"}
                 </button>
-              </div>
+              )}
+            </div>
 
+            {isEditingCase ? (
+              <textarea
+                value={form.codeSnippet || ""}
+                onChange={(e) =>
+                  setForm({ ...form, codeSnippet: e.target.value })
+                }
+                className="w-full border p-3 rounded font-mono text-sm h-40"
+                placeholder="Paste your ABAP code here..."
+              />
+            ) : (
               <pre className="bg-gray-100 p-3 rounded overflow-x-auto text-sm">
                 <code>{caseData.codeSnippet}</code>
               </pre>
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
-        {/* UPLOADER */}
+        {/* UPLOAD */}
         {role === "admin" && (
           <div className="mt-6">
             <ImageUploader caseId={caseData.id} onUpload={fetchCase} />
@@ -263,7 +253,7 @@ export default function CaseDetail() {
           <div className="mt-10">
             <h2 className="font-semibold text-lg mb-4">Debug / Flow</h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div className="grid md:grid-cols-2 gap-5">
               {images.map((img) => (
                 <div key={img.id} className="bg-white border p-3 rounded-xl">
                   <img
@@ -296,10 +286,7 @@ export default function CaseDetail() {
             onClick={() => setSelectedImage(null)}
             className="fixed inset-0 bg-black/70 flex items-center justify-center p-4"
           >
-            <img
-              src={selectedImage}
-              className="max-h-[90%] rounded-lg"
-            />
+            <img src={selectedImage} className="max-h-[90%] rounded-lg" />
           </div>
         )}
       </div>

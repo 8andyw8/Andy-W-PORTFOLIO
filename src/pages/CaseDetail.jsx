@@ -50,6 +50,7 @@ export default function CaseDetail() {
     setRole(data?.role || "viewer");
   };
 
+  // ✅ FIX: handle RLS empty array
   const fetchCase = async () => {
     const { data, error } = await supabase
       .from("cases")
@@ -58,6 +59,7 @@ export default function CaseDetail() {
       .single();
 
     if (error) {
+      console.error(error);
       setCaseData(null);
       return;
     }
@@ -65,11 +67,15 @@ export default function CaseDetail() {
     setCaseData(data);
     setForm(data);
 
-    const { data: imgData } = await supabase
+    const { data: imgData, error: imgError } = await supabase
       .from("case_images")
       .select("*")
       .eq("case_id", data.id)
       .order("created_at", { ascending: true });
+
+    if (imgError) {
+      console.error("IMG ERROR:", imgError.message);
+    }
 
     setImages(imgData || []);
   };
@@ -99,6 +105,14 @@ export default function CaseDetail() {
     setImages((prev) => prev.filter((img) => img.id !== id));
   };
 
+  // ✅ NEW: update note
+  const handleUpdateNote = async (id, note) => {
+    await supabase
+      .from("case_images")
+      .update({ note })
+      .eq("id", id);
+  };
+
   const handleCopy = () => {
     navigator.clipboard.writeText(caseData.codeSnippet || "");
     setCopied(true);
@@ -122,7 +136,6 @@ export default function CaseDetail() {
 
         {/* HEADER */}
         <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
-
           <div className="w-full">
             <h1 className="text-3xl font-bold">{caseData.title}</h1>
 
@@ -203,7 +216,7 @@ export default function CaseDetail() {
             );
           })}
 
-          {/* CODE SNIPPET */}
+          {/* CODE */}
           <div className="bg-white border rounded-xl p-4">
             <div className="flex justify-between items-center mb-2">
               <h3 className="font-semibold">Code Snippet</h3>
@@ -254,15 +267,28 @@ export default function CaseDetail() {
             <div className="grid md:grid-cols-2 gap-5">
               {images.map((img) => (
                 <div key={img.id} className="bg-white border p-3 rounded-xl">
+
                   <img
                     src={img.image_url}
                     onClick={() => setSelectedImage(img.image_url)}
                     className="rounded cursor-pointer"
                   />
 
-                  <p className="text-sm text-gray-500 mt-2">
-                    {img.note || "-"}
-                  </p>
+                  {/* ✅ NOTE EDIT FIX */}
+                  {role === "admin" ? (
+                    <textarea
+                      defaultValue={img.note || ""}
+                      placeholder="Add note..."
+                      onBlur={(e) =>
+                        handleUpdateNote(img.id, e.target.value)
+                      }
+                      className="w-full mt-2 border p-2 rounded text-sm"
+                    />
+                  ) : (
+                    <p className="text-sm text-gray-500 mt-2">
+                      {img.note || "-"}
+                    </p>
+                  )}
 
                   {role === "admin" && (
                     <button

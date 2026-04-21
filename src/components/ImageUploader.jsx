@@ -1,76 +1,67 @@
-import { useState } from "react";
 import { supabase } from "../supabase";
 
 export default function ImageUploader({ caseId, onUpload }) {
-  const [uploading, setUploading] = useState(false);
-
   const uploadImages = async (e) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
-    setUploading(true);
+    const uploadedImages = [];
 
-    try {
-      for (let file of files) {
-        const fileName = `${Date.now()}-${file.name}`;
+    for (let file of files) {
+      try {
+        const filePath = `${caseId}/${Date.now()}-${file.name}`;
 
-        // 1. Upload ke storage
+        // 🔥 Upload
         const { error: uploadError } = await supabase.storage
           .from("cases")
-          .upload(fileName, file);
+          .upload(filePath, file);
 
-        if (uploadError) {
-          console.error("UPLOAD ERROR:", uploadError.message);
-          continue;
-        }
+        if (uploadError) throw uploadError;
 
-        // 2. Ambil public URL
-        const { data: publicUrlData } = supabase.storage
+        // 🔥 Get URL
+        const { data } = supabase.storage
           .from("cases")
-          .getPublicUrl(fileName);
+          .getPublicUrl(filePath);
 
-        // 3. Simpan ke DB
-        const { error: insertError } = await supabase
+        const finalUrl = `${data.publicUrl}?t=${Date.now()}`;
+
+        // 🔥 Insert DB
+        const { data: inserted, error: insertError } = await supabase
           .from("case_images")
           .insert([
             {
               case_id: caseId,
-              image_url: publicUrlData.publicUrl,
+              image_url: finalUrl,
             },
-          ]);
+          ])
+          .select()
+          .single();
 
-        if (insertError) {
-          console.error("INSERT ERROR:", insertError.message);
-          continue;
-        }
+        if (insertError) throw insertError;
+
+        uploadedImages.push(inserted);
+      } catch (err) {
+        console.error("UPLOAD FLOW ERROR:", err.message);
       }
-
-      // 🔥 PENTING: panggil SEKALI setelah semua upload selesai
-      if (onUpload) {
-        await onUpload();
-      }
-
-      alert("Upload selesai");
-    } catch (err) {
-      console.error("UNEXPECTED ERROR:", err);
-    } finally {
-      setUploading(false);
     }
+
+    // 🔥 SAFE UPDATE
+    if (uploadedImages.length > 0 && onUpload) {
+      onUpload(uploadedImages);
+    }
+
+    // reset input biar bisa upload file sama lagi
+    e.target.value = "";
+
+    alert("Upload selesai");
   };
 
   return (
-    <div>
-      <input
-        type="file"
-        multiple
-        onChange={uploadImages}
-        disabled={uploading}
-        className="border p-2 rounded"
-      />
-
-      {uploading && (
-        <p className="text-sm text-gray-500 mt-2">Uploading...</p>
-      )}
-    </div>
+    <input
+      type="file"
+      multiple
+      onChange={uploadImages}
+      className="border p-2 rounded"
+    />
   );
 }

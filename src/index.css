@@ -2,9 +2,9 @@
 @import "tw-animate-css";
 @media print {
   body {
-    background: linear-gradient(180deg, #0f172a 0%, #020617 100%);
-  color: white;
-  }
+  background-color: #f5f7fb;
+  color: #1f2937;
+}
 
   html {
   scroll-behavior: smooth;
